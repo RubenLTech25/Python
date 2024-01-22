@@ -1,0 +1,199 @@
+Example of using Python 3 to perform a simple linear regression
+In this project, an owner of an ice cream business would like a simple model that can predict the daily revenue in dollars based on the outside air temperatures. 
+Problem statement: Do sales increase/decrease with the change of outside temperature?
+
+Temperature will be the independent variable of X. Dependent variable will be overall daily revenue generated in dollars or Y.
+
+Importing libraries and datasets:
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+from jupyterthemes import jtplot
+jtplot.style(theme='monokai', context='notebook', ticks=True, grid=False) 
+
+sales_df = pd.read_csv('IceCreamData.csv')
+sales_df
+
+Temperature	Revenue
+0	24.566884	534.799028
+1	26.005191	625.190122
+2	27.790554	660.632289
+3	20.595335	487.706960
+4	11.503498	316.240194
+...	...	...
+495	22.274899	524.746364
+496	32.893092	755.818399
+497	12.588157	306.090719
+498	22.362402	566.217304
+499	28.957736	655.660388
+500 rows x 2 columns
+
+#visualizing the first 7 rows of data
+sales_df.head(7)
+  Temperature	Revenue
+0	24.566884	534.799028
+1	26.005191	625.190122
+2	27.790554	660.632289
+3	20.595335	487.706960
+4	11.503498	316.240194
+5	14.352514	367.940744
+6	13.707780	308.894518
+
+#visualizing the last 8 rows of data
+sales_df.tail(8)
+   Temperature Revenue
+492	23.056214	552.819351
+493	14.931506	377.430928
+494	25.112066	571.434257
+495	22.274899	524.746364
+496	32.893092	755.818399
+497	12.588157	306.090719
+498	22.362402	566.217304
+499	28.957736	655.660388
+
+#Information about dataframe
+
+sales_df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 500 entries, 0 to 499
+Data columns (total 2 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   Temperature  500 non-null    float64
+ 1   Revenue      500 non-null    float64
+dtypes: float64(2)
+memory usage: 7.9 KB
+
+sales_df.describe()
+Temperature	Revenue
+count	500.000000	500.000000
+mean	22.232225	521.570777
+std	8.096388	175.404751
+min	0.000000	10.000000
+25%	17.122258	405.558681
+50%	22.392791	529.368565
+75%	27.740674	642.257922
+max	45.000000	1000.000000
+
+#Perform Data Visualization
+plt.figure(figsize = (13,7))
+sns.scatterplot(x = 'Temperature', y = 'Revenue', data = sales_df)
+plt.grid()
+
+#Regression Analysis
+plt.figure(figsize = (13, 7))
+sns.regplot(x = 'Temperature', y = 'Revenue', data = sales_df)
+plt.grid()
+
+#Training a machine learning model
+X = sales_df['Temperature']
+y = sales_df['Revenue']
+
+X = np.array(X)
+y = np.array(y)
+
+# reshaping the array from (500,) to (500, 1)
+X = X.reshape(-1,1)
+print(X.shape)
+
+# reshaping the array from (500,) to (500, 1)
+y = y.reshape(-1,1)
+print(y.shape)
+(500, 1)
+(500, 1)
+
+#spliting data for testing and training
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+
+#Training a linear regression model in Scikit Learn
+from sklearn.linear_model import LinearRegression
+
+SimpleLinearRegression = LinearRegression(fit_intercept = True)
+SimpleLinearRegression.fit(X_train, y_train)
+LinearRegression()
+#model was successfully trained
+
+print('Linear Model Coeff(m)', SimpleLinearRegression.coef_)
+print('Linear Model Coeff(b)', SimpleLinearRegression.intercept_)
+Linear Model Coeff(m) [[21.47363681]]
+Linear Model Coeff(b) [42.55641737]
+
+#Evaluating trained simple linear regression model in Scikit Learn
+
+#Using testing model 
+plt.scatter(X_train, y_train, color = 'gray')
+plt.plot(X_train, SimpleLinearRegression.predict(X_train), color = 'r')
+plt.ylabel('Revenue [$]')
+plt.xlabel('T [degC]')
+plt.title('Revenue Generated vs. Temperature')
+#Visualizes data with scatter plot graph
+
+accuracy_LinearRegression = SimpleLinearRegression.score(X_test, y_test)
+accuracy_LinearRegression
+0.983022692648877
+#Testing model is 0.98% accurate
+
+#Using Training model
+plt.scatter(X_test, y_test, color = 'gray')
+plt.plot(X_test, SimpleLinearRegression.predict(X_test), color = 'r')
+plt.ylabel('Revenue [$]')
+plt.xlabel('T [degC]')
+plt.title('Revenue Generated vs. Temperature')
+
+#Use the trained model to generate predictions
+Temp = np.array([20])
+Temp = Temp.reshape(-1,1)
+
+Revenue = SimpleLinearRegression.predict(Temp)
+print('Revenue Predictions =', Revenue)
+Revenue Predictions = [[472.02915359]]
+# if today's temperature is 20 degrees, the shop can expect to make $472.03
+
+#Additional testing with increasing temperatures
+Temp = np.array([25])
+Temp = Temp.reshape(-1,1)
+
+Revenue = SimpleLinearRegression.predict(Temp)
+print('Revenue Predictions =', Revenue)
+Revenue Predictions = [[579.39733764]]
+#if today's temperature is 25 degrees, the shop can expect to make $579.40
+
+Temp = np.array([30])
+Temp = Temp.reshape(-1,1)
+
+Revenue = SimpleLinearRegression.predict(Temp)
+print('Revenue Predictions =', Revenue)
+Revenue Predictions = [[686.7655217]]
+#if today's temperature is 30 degrees, the shop can expect to make $686.77
+
+Temp = np.array([39.1])
+Temp = Temp.reshape(-1,1)
+
+Revenue = SimpleLinearRegression.predict(Temp)
+print('Revenue Predictions =', Revenue)
+Revenue Predictions = [[882.17561668]]
+#If the Borg want ice cream or it's really hot outside, the shop can expect to make $882.18
+
+#Additional Testing with decreasing temperatures
+
+Temp = np.array([15])
+Temp = Temp.reshape(-1,1)
+
+Revenue = SimpleLinearRegression.predict(Temp)
+print('Revenue Predictions =', Revenue)
+Revenue Predictions = [[364.66096953]]
+#If the today's temperature is 15 degrees, the shop can expect to make $364.66
+
+Temp = np.array([10])
+Temp = Temp.reshape(-1,1)
+
+Revenue = SimpleLinearRegression.predict(Temp)
+print('Revenue Predictions =', Revenue)
+Revenue Predictions = [[257.29278548]]
+#If today's temperature is 10 degrees, the shop can expect to make $257.29
+
