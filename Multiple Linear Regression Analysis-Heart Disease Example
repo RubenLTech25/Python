@@ -1,0 +1,155 @@
+Testing a PySpark Machine Learning Model to predict how many people may develop heart disease in a particular population using a multiple linear regression analysis. 
+
+#I use PySpark CSV reader to read survey data into a DataFrame
+from pyspark.sql import SparkSession
+from structs import heart_schema
+
+spark = SparkSession.builder.getOrCreate()
+
+heart_df = spark.read.csv('heart_data.csv', header = True, schema=heart_schema)
+
+heart_df.printSchema()
+
+print(heart_df.schema)
+
+heart_df.show
+
+#I use PySpark SQL to observe and obtain survey data
+heart_df.createOrReplaceTempView('HEART_DATA')
+spark.sql('SELECT biking, smoking, heart_disease FROM HEART_DATA').show (10)
++----------------+----------------+----------------+                            
+|          biking|         smoking|   heart_disease|
++----------------+----------------+----------------+
+|30.8012457056902|10.8966080237878|11.7694227799599|
+| 65.129215165507|2.21956317569129|2.85408147801992|
+|1.95966453105211|17.5883305108873|17.1778034757926|
+|44.8001956157386|2.80255887506064|6.81664690867892|
+|69.4284536754712|15.9745045953896|4.06222352243168|
+|54.4036255460232|29.3331755213439|9.55004599703223|
+|49.0561619559303|9.06084577110596|7.62450698041603|
+|4.78460420155898|12.8350208034972|15.8546544341453|
+|65.7307882993482|11.9912972834427|3.06746173004763|
+|35.2574489386752|23.2776834309334|12.0984843702583|
++----------------+----------------+----------------+
+
+#Reassigning to a data frame:
+heart_df.createOrReplaceTempView('HEART_DATA')
+df = spark.sql('SELECT biking, smoking, heart_disease FROM HEART_DATA')
+df.printSchema()
+
+#note: to show multivariable, change SQL query to Select * (or select all) 
+
+#Isolating independent variables for machine learning:
+heart_df.createOrReplaceTempView('HEART_DATA')
+df = spark.sql('SELECT * FROM HEART_DATA')
+df = df.drop('heart_disease')
+df = df.drop('index')
+df.printSchema()
+
+inputlist = df.columns
+print(inputlist)
+
+#Creating a vector of independent variables from the survey data using PySpark
+heart_df.show
+
+heart_df.createOrReplaceTempView('HEART_DATA')
+df = spark.sql('SELECT * FROM HEART_DATA')
+df = df.drop('heart_disease')
+df = df.drop('index')
+df.printSchema()
+
+inputlist = df.columns
+print(inputlist)
+
+from pyspark.ml.feature import VectorAssembler
+
+features_assembler = VectorAssembler(inputCols=inputlist, outputCol= 'features')
+
+df = features_assembler.transform(heart_df)
+
+df.printSchema()
+
+working_df = df.select('features', 'heart_disease')
+working_df.show()
+
+#Test the ML model
+
+training, test = working_df.randomSplit([0.7, 0.3])
+
+heart_df.createOrReplaceTempView('HEART_DATA')
+df = spark.sql('SELECT * FROM HEART_DATA')
+df = df.drop('heart_disease')
+df = df.drop('index')
+df.printSchema()
+
+inputlist = df.columns
+print(inputlist)
+
+from pyspark.ml.feature import VectorAssembler
+
+features_assembler = VectorAssembler(inputCols=inputlist, outputCol= 'features')
+
+df = features_assembler.transform(heart_df)
+
+df.printSchema()
+
+working_df = df.select('features', 'heart_disease')
+heart_df.show
+
+heart_df.createOrReplaceTempView('HEART_DATA')
+df = spark.sql('SELECT * FROM HEART_DATA')
+df = df.drop('heart_disease')
+df = df.drop('index')
+df.printSchema()
+
+inputlist = df.columns
+print(inputlist)
+
+from pyspark.ml.feature import VectorAssembler
+
+features_assembler = VectorAssembler(inputCols=inputlist, outputCol= 'features')
+
+df = features_assembler.transform(heart_df)
+
+df.printSchema()
+
+working_df = df.select('features', 'heart_disease')
+working_df.show()
+
+training, test = working_df.randomSplit([0.7, 0.3])
+from pyspark.ml.regression import LinearRegression
+
+lr = LinearRegression(featuresCol='features', labelCol=('heart_disease'))
+model = lr.fit(training)
+predict_output = model.transform(test)
+
+predict_output.show()
++--------------------+----------------+------------------+
+|            features|   heart_disease|        prediction|
++--------------------+----------------+------------------+
+|[1.25784111954272...|16.7368633119264|  17.4398348232569|
+|[1.95966453105211...|17.1778034757926| 17.74556398574826|
+|[2.63393461238593...|16.3756622084764| 17.74708016942452|
+|[2.97716030431911...|15.1627752380115|15.044583420690161|
+|[3.95036719692871...|14.6357693245841|15.307284381796682|
+|[4.69986254675314...|15.5694793547691|15.792898094029887|
+|[5.4717883374542,...|17.6180620028488| 16.76815708016951|
+|[7.58214340172708...|18.0812684150877| 18.80886513837671|
+|[8.12895551556721...|14.4437736916377|14.384748431633243|
+|[8.27974338829517...|13.4951676503312|14.451595345341957|
+|[8.52230984391645...| 17.857848701604| 18.67546196396167|
+|[8.63364275265485...|14.4858120944068|14.010029202170916|
+|[8.79657230013981...|16.5272933093538|16.178795136209533|
+|[9.41377807455137...|13.5250712447217|14.621231301510923|
+|[9.93761745002121...|16.3846780226745| 17.01079010612373|
+|[10.2619999106973...|17.1060395234265|17.765662582526375|
+|[10.353647894226,...|14.0886540104569|15.777835482181214|
+|[10.5530749158934...|14.0794783264219|13.917476526023915|
+|[10.6109690801241...|16.7460356063431| 16.32354264311016|
+|[11.326814383734,...|14.5243489099665|14.350971855841673|
++--------------------+----------------+------------------+
+only showing top 20 rows
+
+
+
+
