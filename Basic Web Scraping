@@ -1,0 +1,64 @@
+#This is my code to perform a basic web scrape
+
+#Installing libraries
+
+!mamba install bs4==4.10.0 -y
+!pip install lxml==4.6.4
+!mamba install html5lib==1.1 -y
+# !pip install requests==2.26.0
+
+#Import the required modules and functions
+from bs4 import BeautifulSoup # this module helps in web scrapping.
+import requests  # this module helps us to download a web page
+
+#test HTML code
+%%html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body>
+<h3><b id='boldest'>Lebron James</b></h3>
+<p> Salary: $ 92,000,000 </p>
+<h3> Stephen Curry</h3>
+<p> Salary: $85,000, 000 </p>
+<h3> Kevin Durant </h3>
+<p> Salary: $73,200, 000</p>
+</body>
+</html>
+
+#to parse a document, pass to BeautifulSoup
+
+soup = BeautifulSoup(html, "html.parser")
+
+#To display HTML in nested structure
+print(soup.prettify())
+
+#to display Tag title
+tag_object=soup.title
+print("tag object:",tag_object)
+
+print("tag object type:",type(tag_object))
+
+#This tag example would give use the most paid player in the NBA
+tag_object=soup.h3
+tag_object
+
+#Downloading and scraping the contents of a web page
+
+#Install libraries as above
+
+#we will use IBM as a test scrape
+url = "http://www.ibm.com"
+
+#Download the contents of the webpage in text format and store in variable called data
+data  = requests.get(url).text 
+
+#Create a beautifulsoup object using the beautifulsoup constructor
+soup = BeautifulSoup(data,"html.parser")  # create a soup object using the variable 'data'
+
+#Scrape all links
+for link in soup.find_all('a',href=True):  # in html anchor/link is represented by the tag <a>
+
+    print(link.get('href'))
