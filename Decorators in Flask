@@ -1,0 +1,29 @@
+#This will help interpreters while running python code
+
+
+#This method decorator is known as a wrapper. This wraps the output of the function. 
+def jsonify_decorator(function):
+    def modifyOutput():
+        return {"output":function()}
+    return modifyOutput
+
+@jsonify_decorator
+def hello():
+    return 'hello world'
+
+@jsonify_decorator
+def add():
+    num1 = input("Enter a number - ")
+    num2 = input("Enter another number - ")
+    return int(num1)+int(num2)
+
+print(hello())
+print(add())
+
+#Example of route decorators
+@app.route("/")
+@app.route("/home")
+@app.route("/index")
+def home():
+    return "Hello World!"
+
