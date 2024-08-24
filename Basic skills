@@ -2,3 +2,129 @@
 print ("Hello, world!")
 Hello, world!
 
+#Working with Flask for AI app deployment
+
+#Accessing Form data with flask.request.form
+<form method="POST" action="/login">
+    <input type="text" name="username">
+    <input type="password" name="password">
+    <input type="submit" value="Submit">
+</form>
+
+#python code to access username and password
+from flask import request
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+    # process login here
+
+#Redirecting to a URL with flask.redirect
+from flask import redirect
+
+@app.route('/admin')
+def admin():
+    return redirect('/login')
+
+#generating dynamic URLs with flask.url_for
+from flask import url_for
+
+@app.route('/admin')
+def admin():
+    return redirect(url_for('login'))
+
+@app.route('/login')
+def login():
+    return "<Login Page>"
+
+#Handling different HTTP request types
+@app.route('/data', methods=['GET', 'POST'])
+def data():
+    if request.method == 'POST':
+        # process POST request
+    if request.method == 'GET':
+        # process GET request
+
+#In the HTML file, you will add a form that allows both GET and POST requests:
+<!-- For POST -->
+<form method="POST" action="/data">
+    <!-- Your input fields here -->
+    <input type="submit" value="Submit">
+</form>
+
+<!-- For GET -->
+<a href="/data">Fetch data</a>
+
+#CRUD Operations - Create, Read, Update, and Delete
+
+#Create
+
+#HTML form for creating data
+<form method="POST" action="/create">
+    <input type="text" name="name">
+    <input type="submit" value="Create">
+</form>
+
+#python code
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'POST':
+        # Access form data
+        name = request.form['name']
+        # Create a new record with the name
+        record = create_new_record(name)  # Assuming you have this function defined
+        # Redirect user to the new record
+        return redirect(url_for('read', id=record.id))
+    # Render the form for GET request
+    return render_template('create.html')
+
+#Read
+
+#python code that shows the ID can be accessed from the route. 
+@app.route('/read/<int:id>', methods=['GET'])
+def read(id):
+    # Get the record by id
+    record = get_record(id)  # Assuming you have this function defined
+    # Render a template with the record
+    return render_template('read.html', record=record)
+
+#Update operation
+
+#Sample HTML form for updating data
+<form method="POST" action="/update/{{record.id}}">
+    <input type="text" name="name" value="{{record.name}}">
+    <input type="submit" value="Update">
+</form>
+
+#python code
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    if request.method == 'POST':
+        # Access form data
+        name = request.form['name']
+        # Update the record with the new name
+        update_record(id, name)  # Assuming you have this function defined
+        # Redirect user to the updated record
+        return redirect(url_for('read', id=id))
+    
+    # Render the form for GET request with current data
+    record = get_record(id)  # Assuming you have this function defined
+    return render_template('update.html', record=record)
+
+#Delete
+
+#example of deleting data, typically require the ID to be passed, as reporeted by the HTML page, in the form of an argument to the function
+
+#sample HTML form for deleting data
+<form method="POST" action="/delete/{{record.id}}">
+    <input type="submit" value="Delete">
+</form>
+
+#sample python code
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete(id):
+    # Delete the record
+    delete_record(id)  # Assuming you have this function defined
+    # Redirect user to the homepage
+    return redirect(url_for('home'))
