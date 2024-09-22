@@ -1,0 +1,141 @@
+#creating a function to identify unique values in a list and return them as new list
+def unique_values(input_list):
+    unique_list = list(set(input_list))
+    return unique_list
+
+# Example usage
+example_list = [1, 2, 2, 3, 4, 4, 5]
+print(unique_values(example_list))  # Output: [1, 2, 3, 4, 5]
+
+#Function to reverse a string
+def reverse_string(input_string):
+    return input_string[::-1]
+
+# Example usage
+example_string = "Hello, World!"
+print(reverse_string(example_string))  # Output: !dlroW ,olleH
+
+#function to return indices of any two numbers in a given array to add up to a specific target
+def two_sum(nums, target):
+    lookup = {}
+    for i, num in enumerate(nums):
+        if target - num in lookup:
+            return [lookup[target - num], i]
+        lookup[num] = i
+    return None
+
+# Example usage
+example_nums = [2, 7, 11, 15]
+target = 9
+print(two_sum(example_nums, target))  # Output: [0, 1]
+
+#Advanced function to allow user to specify target number and function will return numbers in a given array
+def two_sum(nums, target):
+    lookup = {}
+    for i, num in enumerate(nums):
+        if target - num in lookup:
+            return [nums[lookup[target - num]], num]
+        lookup[num] = i
+    return None
+
+# Example usage
+example_nums = [2, 7, 11, 15]
+target = 9
+print(two_sum(example_nums, target))  # Output: [2, 7]
+
+#function to count frequency of each character in a string using a dictionary
+def char_frequency(input_string):
+    frequency_dict = {}
+    for char in input_string:
+        if char in frequency_dict:
+            frequency_dict[char] += 1
+        else:
+            frequency_dict[char] = 1
+    return frequency_dict
+
+# Example usage
+example_string = "hello world"
+print(char_frequency(example_string))
+# Output: {'h': 1, 'e': 1, 'l': 3, 'o': 2, ' ': 1, 'w': 1, 'r': 1, 'd': 1}
+
+#function to find the first non-repeating character in a string and return its index
+def first_non_repeating_char(input_string):
+    char_count = {}
+    for char in input_string:
+        if char in char_count:
+            char_count[char] += 1
+        else:
+            char_count[char] = 1
+
+    for index, char in enumerate(input_string):
+        if char_count[char] == 1:
+            return index
+    return -1
+
+# Example usage
+example_string = "swiss"
+print(first_non_repeating_char(example_string))  # Output: 0
+
+#function to reverse the digits of an integer
+def reverse_integer(n):
+    reversed_num = 0
+    while n > 0:
+        digit = n % 10
+        reversed_num = reversed_num * 10 + digit
+        n //= 10
+    return reversed_num
+
+# Example usage
+example_number = 12345
+print(reverse_integer(example_number))  # Output: 54321
+
+#function to check if a string is a palindrome
+def is_palindrome(input_string):
+    # Remove any spaces and convert to lowercase
+    cleaned_string = input_string.replace(" ", "").lower()
+    # Check if the cleaned string is equal to its reverse
+    return cleaned_string == cleaned_string[::-1]
+
+# Example usage
+example_string = "A man a plan a canal Panama"
+print(is_palindrome(example_string))  # Output: True
+
+#function to remove duplicates from a list while maintaining the original order
+def remove_duplicates(input_list):
+    seen = set()
+    unique_list = []
+    for item in input_list:
+        if item not in seen:
+            unique_list.append(item)
+            seen.add(item)
+    return unique_list
+
+# Example usage
+example_list = [1, 2, 2, 3, 4, 4, 5]
+print(remove_duplicates(example_list))  # Output: [1, 2, 3, 4, 5]
+
+#function to generate the Fibonacci sequence up to 'n'terms
+def fibonacci_sequence(n):
+    sequence = []
+    a, b = 0, 1
+    for _ in range(n):
+        sequence.append(a)
+        a, b = b, a + b
+    return sequence
+
+# Example usage
+n_terms = 10
+print(fibonacci_sequence(n_terms))  # Output: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+#function to find common elements between two lists
+def common_elements(list1, list2):
+    return list(set(list1) & set(list2))
+
+# Example usage
+list1 = [1, 2, 3, 4, 5]
+list2 = [4, 5, 6, 7, 8]
+print(common_elements(list1, list2))  # Output: [4, 5]
+
+
+
+
